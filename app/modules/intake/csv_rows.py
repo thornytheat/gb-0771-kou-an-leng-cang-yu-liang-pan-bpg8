@@ -3,7 +3,9 @@ from io import StringIO
 from app.faults import DockFault
 
 
-def rows(text, fields, source):
+def rows(text, fields, source, optional=()):
+    optional = set(optional)
+    required = tuple(field for field in fields if field not in optional)
     stream = csv.reader(StringIO(text.removeprefix('\ufeff'), newline=''), strict=True)
     accepted, isolated = [], []
     blanks, headers, total = 0, 0, 0
@@ -11,7 +13,8 @@ def rows(text, fields, source):
         header = next(stream, None)
         if header is None:
             raise DockFault('EMPTY', f'{source} 原件为空')
-        if len(header) != len(fields) or set(header) != set(fields):
+        if (len(header) < len(required) or len(header) > len(fields) or
+                not set(required).issubset(header) or not set(header).issubset(fields)):
             raise DockFault('HEADER', f'{source} 表头不符')
         while True:
             line = stream.line_num + 1

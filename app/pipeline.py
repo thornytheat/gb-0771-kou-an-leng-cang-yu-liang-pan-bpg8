@@ -17,7 +17,8 @@ def review(files, until=None):
     custody = replay(raw['tables']['moves'], locations, start, end)
     if until == 'custody':
         return custody
-    air = exposure(custody['periods'], locations, raw['tables']['doors'], raw['tables']['temperatures'])
+    air = exposure(custody['periods'], locations, raw['tables']['doors'], raw['tables']['temperatures'],
+                   files=files)
     if until == 'exposure':
         return air
     stock = reconcile(locations, custody, air, end)

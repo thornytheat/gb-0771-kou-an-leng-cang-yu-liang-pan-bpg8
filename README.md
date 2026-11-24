@@ -12,7 +12,9 @@
 
 ## 输入与接口
 
-`POST /api/receipts` 传入 `{"sample":"dirty"}` 或 `{"sample":"clean"}`。自有原件需要 `moves`、`slots`、`doors`、`temperatures`、`lots`、`window` 六个文本字段，前五项为 CSV，最后一项为 JSON 文本。
+`POST /api/receipts` 传入 `{"sample":"dirty"}` 或 `{"sample":"clean"}`。自有原件需要 `moves`、`slots`、`doors`、`temperatures`、`lots`、`window` 六个文本字段，前五项为 CSV，最后一项为 JSON 文本；可另传第七份 `handovers` 交接/验收记录。
+
+探头换型时，温度 CSV 可带 `probe` 列。两支探头在同一有效窗内给出冷暖不一致读数、且没有交接结论覆盖该时段时，暴露页列为 `disputed`（探头争议时段 · 留待核实）。交接记录可用 `probe`/`selected_probe`（或按 `temperature_line`）指定采信探头，并用 `accept_from`/`accept_until`（或 `from`/`until`、验收单号关联的区间）限定改判范围。`old_probe`、`removed_at` 或撤下动作会提前终止旧探头读数效力；重复交接记录按事件号或内容幂等处理。归档后可向 `/api/receipts/<id>/handovers` 补交记录，暴露接口和页面会按交接结论重算。
 
 `GET /api/observe/<view>` 支持 `intake`、`registry`、`custody`、`exposure`、`capacity`，参数 `sample` 选择样例，`receipt` 查询归档。`GET /api/receipts/<id>` 查看归档，`POST /api/receipts/<id>/refresh` 复算，`GET /api/certificate/<id>/export` 下载证据。
 

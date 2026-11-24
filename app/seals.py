@@ -11,4 +11,4 @@ def sha(text):
 
 
 def input_seals(files):
-    return {source: sha(text) for source, text in files.items()}
+    return {source: sha(text if isinstance(text, str) else compact(text)) for source, text in files.items()}

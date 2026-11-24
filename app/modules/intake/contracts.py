@@ -3,7 +3,14 @@ from app.utc import second
 COLUMNS = {
     'moves': ('event', 'lot', 'kind', 'slot', 'ticket', 'effective', 'received'),
     'doors': ('door', 'signal', 'effective'),
-    'temperatures': ('door', 'celsius', 'effective'),
+    'temperatures': ('door', 'celsius', 'effective', 'probe', 'probe_id', 'sensor', 'sensor_id',
+                     '探头', '探头编号', 'removed', 'retired', 'removed_at', 'retired_at',
+                     'probe_until', 'valid_to', 'until'),
+}
+OPTIONAL_COLUMNS = {
+    'temperatures': ('probe', 'probe_id', 'sensor', 'sensor_id', '探头', '探头编号',
+                     'removed', 'retired', 'removed_at', 'retired_at', 'probe_until',
+                     'valid_to', 'until'),
 }
 MISSING = {'', '-', 'N/A', 'NULL', '未知'}
 MOVES = {'IN', 'MOVE', 'OUT', 'HOLD', 'RELEASE', 'CANCEL', 'SEAL'}
@@ -11,7 +18,8 @@ MOVES = {'IN', 'MOVE', 'OUT', 'HOLD', 'RELEASE', 'CANCEL', 'SEAL'}
 
 def normalize(row):
     source = row['source']
-    required = set(COLUMNS[source]) - {'slot', 'ticket'}
+    optional = OPTIONAL_COLUMNS.get(source, ())
+    required = set(COLUMNS[source]) - {'slot', 'ticket'} - set(optional)
     if any(row[key] in MISSING for key in required):
         return 'MISSING'
     if source == 'moves' and (row['kind'] not in MOVES or

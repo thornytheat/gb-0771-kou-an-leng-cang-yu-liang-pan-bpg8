@@ -1,12 +1,13 @@
 from collections import defaultdict
-from .contracts import COLUMNS, normalize
+from .contracts import COLUMNS, OPTIONAL_COLUMNS, normalize
 from .csv_rows import rows
 
 
 def intake(files):
     accepted, isolation, metrics, copies = {}, [], {}, []
     for source, fields in COLUMNS.items():
-        parsed, rejected, counts = rows(files[source], fields, source)
+        parsed, rejected, counts = rows(files[source], fields, source,
+                                        optional=OPTIONAL_COLUMNS.get(source, ()))
         valid, by_event, repeated = [], defaultdict(list), []
         for row in parsed:
             reason = normalize(row)
